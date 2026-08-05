@@ -103,6 +103,12 @@ if (SYLVAN)
   add_subdirectory (external/sylvan sylvan EXCLUDE_FROM_ALL)
 endif (SYLVAN)
 
+# GPUdecide (Jan Heemstra - Eindhoven University of Technology)
+option(GPU_DECIDE "Build for GPUdecide" ON)
+if (GPU_DECIDE)
+  add_subdirectory(external/gpudecide gpudecide EXCLUDE_FROM_ALL)
+endif (GPU_DECIDE)
+
 # ---------------------------------------------------------------------------- #
 # BLIF parser
 add_subdirectory (external/blifparse libblifparse EXCLUDE_FROM_ALL)

@@ -25,3 +25,6 @@
 [submodule "external/pugixml"]
 	path = external/pugixml
 	url = ../../zeux/pugixml
+[submodule "external/gpudecide"]
+	path = external/gpudecide
+	url = git@gitlab.tue.nl:s145358/gpudecide.git

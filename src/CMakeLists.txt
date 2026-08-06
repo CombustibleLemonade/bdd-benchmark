@@ -182,3 +182,6 @@ set_target_properties(gpudecide_apply_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 
 
 __add_benchmark(gpudecide gpudecide queens bdd)
 set_target_properties(gpudecide_queens_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
+
+__add_benchmark(gpudecide gpudecide tic-tac-toe bdd)
+set_target_properties(gpudecide_tic-tac-toe_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)

@@ -180,6 +180,9 @@ set_target_properties(gpudecide_apply_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 
 __add_benchmark(gpudecide gpudecide game-of-life bdd)
 set_target_properties(gpudecide_game-of-life_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
 
+__add_benchmark(gpudecide gpudecide hamiltonian bdd)
+set_target_properties(gpudecide_hamiltonian_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
+
 __add_benchmark(gpudecide gpudecide queens bdd)
 set_target_properties(gpudecide_queens_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
 

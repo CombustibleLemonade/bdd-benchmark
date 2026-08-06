@@ -21,6 +21,11 @@ class gpudecide_bdd_adapter
 
 	using dd_t         = gpudecide::node_ref;
 	using build_node_t = gpudecide::node_ref;
+
+	static constexpr bool needs_extend     = false;
+	// static constexpr bool needs_frame_rule = true;
+
+	static constexpr bool complement_edges = false;
 	
 	private:
 

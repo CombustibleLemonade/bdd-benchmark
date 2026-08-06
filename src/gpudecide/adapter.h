@@ -97,17 +97,17 @@ class gpudecide_bdd_adapter
 	// 	return f | g;
 	// }
 
-	// inline oxidd::bdd_function
-	// apply_diff(const oxidd::bdd_function& f, const oxidd::bdd_function& g)
-	// {
-	// 	return g.imp_strict(f);
-	// }
+	inline gpudecide::node_ref
+	apply_diff(const gpudecide::node_ref& f, const gpudecide::node_ref& g)
+	{
+		return _bdd.logical_difference(f, g);
+	}
 
-	// inline oxidd::bdd_function
-	// apply_imp(const oxidd::bdd_function& f, const oxidd::bdd_function& g)
-	// {
-	// 	return f.imp(g);
-	// }
+	inline gpudecide::node_ref
+	apply_imp(const gpudecide::node_ref& f, const gpudecide::node_ref& g)
+	{
+		return _bdd.logical_implication(f, g);
+	}
 
 	// inline oxidd::bdd_function
 	// apply_xor(const oxidd::bdd_function& f, const oxidd::bdd_function& g)
@@ -141,16 +141,18 @@ class gpudecide_bdd_adapter
 	// return f;
 	// }
 
-	// inline oxidd::bdd_function
-	// exists(const oxidd::bdd_function& b, int label)
-	// {
-	// return b.exists(_manager.var(label));
-	// }
+	inline gpudecide::node_ref
+	exists(const gpudecide::node_ref& b, int label)
+	{
+		return _bdd.exists(b, label);
+	}
 
 	// inline oxidd::bdd_function
 	// exists(const oxidd::bdd_function& b, const std::function<bool(int)>& pred)
 	// {
-	// return b.exists(cube(pred));
+	// 	std::vector<uint32_t> quantification;
+	// 	for (int i = 0; i < _bdd)
+	// 	return _bdd.exists(b, quantification);
 	// }
 
 	// template <typename IT>
@@ -160,11 +162,11 @@ class gpudecide_bdd_adapter
 	// return b.exists(cube(rbegin, rend));
 	// }
 
-	// inline oxidd::bdd_function
-	// forall(const oxidd::bdd_function& b, int label)
-	// {
-	// return b.forall(_manager.var(label));
-	// }
+	inline gpudecide::node_ref
+	forall(const gpudecide::node_ref& b, int label)
+	{
+		return _bdd.for_all(b, label);
+	}
 
 	// inline oxidd::bdd_function
 	// forall(const oxidd::bdd_function& b, const std::function<bool(int)>& pred)

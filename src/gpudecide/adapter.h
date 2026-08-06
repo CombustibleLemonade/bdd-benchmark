@@ -147,13 +147,17 @@ class gpudecide_bdd_adapter
 		return _bdd.exists(b, label);
 	}
 
-	// inline oxidd::bdd_function
-	// exists(const oxidd::bdd_function& b, const std::function<bool(int)>& pred)
-	// {
-	// 	std::vector<uint32_t> quantification;
-	// 	for (int i = 0; i < _bdd)
-	// 	return _bdd.exists(b, quantification);
-	// }
+	inline gpudecide::node_ref
+	exists(const gpudecide::node_ref& b, const std::function<bool(int)>& pred)
+	{
+		std::vector<uint32_t> quantification;
+		for (int i = 0; i < _bdd.count_layers(); i++) {
+			if (pred(i)) {
+				quantification.push_back(i);
+			}
+		}
+		return _bdd.exists(b, quantification);
+	}
 
 	// template <typename IT>
 	// inline oxidd::bdd_function
@@ -167,12 +171,18 @@ class gpudecide_bdd_adapter
 	{
 		return _bdd.for_all(b, label);
 	}
-
-	// inline oxidd::bdd_function
-	// forall(const oxidd::bdd_function& b, const std::function<bool(int)>& pred)
-	// {
-	// return b.forall(cube(pred));
-	// }
+	
+	inline gpudecide::node_ref
+	forall(const gpudecide::node_ref& b, const std::function<bool(int)>& pred)
+	{
+		std::vector<uint32_t> quantification;
+		for (int i = 0; i < _bdd.count_layers(); i++) {
+			if (pred(i)) {
+				quantification.push_back(i);
+			}
+		}
+		return _bdd.for_all(b, quantification);
+	}
 
 	// template <typename IT>
 	// inline oxidd::bdd_function
@@ -238,12 +248,29 @@ class gpudecide_bdd_adapter
 		return ref.get_metric(results);
 	}
 
-	// inline uint64_t
-	// satcount(const oxidd::bdd_function& f, const size_t vc)
-	// {
-	// assert(vc <= _manager.num_vars());
-	// return f.sat_count_double(vc);
-	// }
+	inline uint64_t
+	satcount(const gpudecide::node_ref& f, const size_t vc)
+	{
+		auto results = _bdd.count_satisfying_assignments();
+		uint64_t result = f.get_metric(results);
+		
+		// assert(vc == _bdd.count_layers());
+		if (vc != _bdd.count_layers()) {
+			// std::cout << "VC: " << vc << std::endl;
+			// std::cout << "Layer count:" << _bdd.count_layers() << std::endl;
+			if (vc < _bdd.count_layers()) {
+				for (int i = _bdd.count_layers(); i >= vc; i--) {
+					// std::cout << "j: " << i << std::endl;
+					result /= 2;
+				}
+			}
+			else {
+				assert(false);
+			}
+		}
+		
+		return result;
+	}
 	
 	// inline oxidd::bdd_function
 	// satone(const oxidd::bdd_function& f)

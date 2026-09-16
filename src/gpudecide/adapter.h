@@ -9,7 +9,7 @@
 
 #include "../common/adapter.h"
 
-#include "SROBDD/bindings/cpp.h"
+#include "SROBDD/bindings/ranger.h"
 
 
 
@@ -19,8 +19,8 @@ class gpudecide_bdd_adapter
 	static constexpr std::string_view name = "GPUdecide";
 	static constexpr std::string_view dd   = "BDD";
 
-	using dd_t         = gpudecide::node_ref;
-	using build_node_t = gpudecide::node_ref;
+	using dd_t         = ranger::node_ref;
+	using build_node_t = ranger::node_ref;
 
 	static constexpr bool needs_extend     = false;
 	// static constexpr bool needs_frame_rule = true;
@@ -29,12 +29,12 @@ class gpudecide_bdd_adapter
 	
 	private:
 
-	gpudecide::bdd _bdd;
-	gpudecide::node_ref _latest_build;
+	ranger::bdd _bdd;
+	ranger::node_ref _latest_build;
 
 	// Init and Deinit
 	public:
-	gpudecide_bdd_adapter(uint32_t varcount) : _bdd(varcount)
+	gpudecide_bdd_adapter(uint32_t varcount) : _bdd(static_cast<uint16_t>(varcount), ranger::SPARSE)
 	{}
 
 	int
@@ -45,28 +45,28 @@ class gpudecide_bdd_adapter
 
 	// BDD Operations
 	public:
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	top()
 	{
 		return _bdd.logical_true();
 	}
 
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	bot()
 	{
 		return _bdd.logical_false();
 	}
 
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	ithvar(uint32_t label)
 	{
-		return _bdd.get_variable(label);
+		return _bdd.variable(static_cast<uint16_t>(label));
 	}
 
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	nithvar(uint32_t label)
 	{
-		gpudecide::node_ref v = ithvar(label);
+		ranger::node_ref v = ithvar(label);
 		return _bdd.logical_not(v);
 	}
 
@@ -102,14 +102,14 @@ class gpudecide_bdd_adapter
 	// 	return f | g;
 	// }
 
-	inline gpudecide::node_ref
-	apply_diff(const gpudecide::node_ref& f, const gpudecide::node_ref& g)
+	inline ranger::node_ref
+	apply_diff(const ranger::node_ref& f, const ranger::node_ref& g)
 	{
 		return _bdd.logical_difference(f, g);
 	}
 
-	inline gpudecide::node_ref
-	apply_imp(const gpudecide::node_ref& f, const gpudecide::node_ref& g)
+	inline ranger::node_ref
+	apply_imp(const ranger::node_ref& f, const ranger::node_ref& g)
 	{
 		return _bdd.logical_implication(f, g);
 	}
@@ -126,8 +126,8 @@ class gpudecide_bdd_adapter
 	// 	return f.equiv(g);
 	// }
 
-	inline gpudecide::node_ref
-	ite(gpudecide::node_ref i, gpudecide::node_ref t, gpudecide::node_ref e)
+	inline ranger::node_ref
+	ite(ranger::node_ref i, ranger::node_ref t, ranger::node_ref e)
 	{
 		return _bdd.logical_ite(i, t, e);
 	}
@@ -146,22 +146,22 @@ class gpudecide_bdd_adapter
 	// return f;
 	// }
 
-	inline gpudecide::node_ref
-	exists(const gpudecide::node_ref& b, int label)
+	inline ranger::node_ref
+	exists(const ranger::node_ref& b, int label)
 	{
-		return _bdd.exists(b, label);
+		return _bdd.exists(b, static_cast<uint16_t>(label));
 	}
 
-	inline gpudecide::node_ref
-	exists(const gpudecide::node_ref& b, const std::function<bool(int)>& pred)
+	inline ranger::node_ref
+	exists(const ranger::node_ref& b, const std::function<bool(int)>& pred)
 	{
-		std::vector<uint32_t> quantification;
-		for (int i = 0; i < _bdd.count_layers(); i++) {
+		std::vector<uint16_t> quantification;
+		for (uint16_t i = 0; i < _bdd.get_depth(); i++) {
 			if (pred(i)) {
 				quantification.push_back(i);
 			}
 		}
-		return _bdd.exists(b, quantification);
+		return _bdd.exists(b, std::move(quantification));
 	}
 
 	// template <typename IT>
@@ -171,22 +171,22 @@ class gpudecide_bdd_adapter
 	// return b.exists(cube(rbegin, rend));
 	// }
 
-	inline gpudecide::node_ref
-	forall(const gpudecide::node_ref& b, int label)
+	inline ranger::node_ref
+	forall(const ranger::node_ref& b, int label)
 	{
-		return _bdd.for_all(b, label);
+		return _bdd.for_all(b, static_cast<uint16_t>(label));
 	}
 	
-	inline gpudecide::node_ref
-	forall(const gpudecide::node_ref& b, const std::function<bool(int)>& pred)
+	inline ranger::node_ref
+	forall(const ranger::node_ref& b, const std::function<bool(int)>& pred)
 	{
-		std::vector<uint32_t> quantification;
-		for (int i = 0; i < _bdd.count_layers(); i++) {
+		std::vector<uint16_t> quantification;
+		for (uint16_t i = 0; i < _bdd.get_depth(); i++) {
 			if (pred(i)) {
 				quantification.push_back(i);
 			}
 		}
-		return _bdd.for_all(b, quantification);
+		return _bdd.for_all(b, std::move(quantification));
 	}
 
 	// template <typename IT>
@@ -241,33 +241,30 @@ class gpudecide_bdd_adapter
 	// }
 
 	inline uint64_t
-	nodecount(const gpudecide::node_ref f)
+	nodecount(const ranger::node_ref f)
 	{
-		return _bdd.count_irreducible_nodes();
+		// Irreducible nodes, as before: GPUdecide is quasi-reduced so its physical node count includes the identity
+		// nodes that other packages in this benchmark do not store.
+		return _bdd.irreducible_node_count(f);
 	}
 
 	inline uint64_t
-	satcount(gpudecide::node_ref ref)
+	satcount(ranger::node_ref ref)
 	{
-		auto results = _bdd.count_satisfying_assignments();
-		return ref.get_metric(results);
+		return _bdd.sat_count(ref);
 	}
 
 	inline uint64_t
-	satcount(const gpudecide::node_ref& f, const size_t vc)
+	satcount(const ranger::node_ref& f, const size_t vc)
 	{
-		auto results = _bdd.count_satisfying_assignments();
-		uint64_t result = f.get_metric(results);
+		// ranger counts over the full depth of the BDD; benchmarks ask for the number of assignments over their own
+		// variable count, so every variable above it contributes a factor two.
+		uint64_t result = _bdd.sat_count(f);
 		
-		// assert(vc == _bdd.count_layers());
-		if (vc != _bdd.count_layers()) {
-			// std::cout << "VC: " << vc << std::endl;
-			// std::cout << "Layer count:" << _bdd.count_layers() << std::endl;
-			if (vc < _bdd.count_layers()) {
-				for (int i = _bdd.count_layers(); i >= vc; i--) {
-					// std::cout << "j: " << i << std::endl;
-					result /= 2;
-				}
+		const size_t depth = _bdd.get_depth();
+		if (vc != depth) {
+			if (vc < depth) {
+				result >>= (depth - vc);
 			}
 			else {
 				assert(false);
@@ -320,24 +317,24 @@ class gpudecide_bdd_adapter
 
 	// BDD Build Operations
 	public:
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	build_node(const bool value)
 	{
-		const gpudecide::node_ref res = value ? top() : bot();
-		if (_latest_build.is_invalid() || _latest_build == top() || _latest_build == bot()) {
+		const ranger::node_ref res = value ? top() : bot();
+		if (!_latest_build.valid() || _latest_build == top() || _latest_build == bot()) {
 			_latest_build = res;
 		}
 		return res;
 	}
 
-	inline gpudecide::node_ref
-	build_node(const uint32_t label, const gpudecide::node_ref& low, const gpudecide::node_ref& high)
+	inline ranger::node_ref
+	build_node(const uint32_t label, const ranger::node_ref& low, const ranger::node_ref& high)
 	{
 		_latest_build = ite(ithvar(label), high, low);
 		return _latest_build;
 	}
 
-	inline gpudecide::node_ref
+	inline ranger::node_ref
 	build()
 	{
 		return std::move(_latest_build);

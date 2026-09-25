@@ -177,6 +177,9 @@ add_benchmark(cnf)
 __add_benchmark(gpudecide gpudecide apply bdd)
 set_target_properties(gpudecide_apply_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
 
+__add_benchmark(gpudecide gpudecide cnf bdd)
+set_target_properties(gpudecide_cnf_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
+
 __add_benchmark(gpudecide gpudecide game-of-life bdd)
 set_target_properties(gpudecide_game-of-life_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
 

@@ -9,7 +9,7 @@
 
 #include "../common/adapter.h"
 
-#include "SROBDD/bindings/ranger.h"
+#include "QROBDD/bindings/ranger.h"
 
 
 
@@ -34,7 +34,7 @@ class gpudecide_bdd_adapter
 
 	// Init and Deinit
 	public:
-	gpudecide_bdd_adapter(uint32_t varcount) : _bdd(static_cast<uint16_t>(varcount), ranger::SPARSE)
+	gpudecide_bdd_adapter(uint32_t varcount) : _bdd(static_cast<uint16_t>(varcount), ranger::SPARSE_LAZY)
 	{}
 
 	int

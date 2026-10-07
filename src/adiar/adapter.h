@@ -35,6 +35,14 @@ public:
     return f();
   }
 
+  // Synchronization
+public:
+  /// No-op; Adiar evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // Statistics
 public:
   inline size_t

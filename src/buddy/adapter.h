@@ -170,6 +170,14 @@ public:
     return f();
   }
 
+  // Synchronization
+public:
+  /// No-op; BuDDy evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
 public:
   inline bdd

@@ -121,6 +121,14 @@ public:
     return RUN(lace_lambda, &f);
   }
 
+  // Synchronization
+public:
+  /// No-op; Sylvan evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
 public:
   inline sylvan::Bdd

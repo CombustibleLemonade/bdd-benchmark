@@ -139,6 +139,7 @@ run_relprod(int argc, char** argv)
 
       const time_point t_rebuild_before = now();
       relation                          = reconstruct(adapter, std::move(libbdd_relation), vm);
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t_rebuild_after  = now();
 
       const size_t rebuild_time = duration_ms(t_rebuild_before, t_rebuild_after);
@@ -165,6 +166,7 @@ run_relprod(int argc, char** argv)
 
       const time_point t_rebuild_before = now();
       states                            = reconstruct(adapter, std::move(libbdd_states), vm);
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t_rebuild_after  = now();
 
       const size_t rebuild_time = duration_ms(t_rebuild_before, t_rebuild_after);
@@ -189,6 +191,7 @@ run_relprod(int argc, char** argv)
 
       const time_point t_build_before = now();
       support                         = build_support(adapter, vm.size());
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t_build_after  = now();
 
       const size_t build_time = duration_ms(t_build_before, t_build_after);
@@ -216,6 +219,7 @@ run_relprod(int argc, char** argv)
     case operand::NEXT: result = adapter.relnext(states, relation, support); break;
     case operand::PREV: result = adapter.relprev(states, relation, support); break;
     }
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t_relprod_after = now();
 
     const size_t relprod_time = duration_ms(t_relprod_before, t_relprod_after);

@@ -86,6 +86,18 @@ struct resource_usage
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Initializes the BDD package and runs the given benchmark
+///
+/// Besides the actual decision diagram operations, every adapter has to provide the following.
+///
+/// - `int run(const F& f)`: runs the benchmark within whatever context the package needs.
+///
+/// - `void sync()`: evaluates everything the package has recorded but not evaluated yet. Packages
+///                  that evaluate each operation immediately have nothing to do here (a no-op).
+///                  A lazily evaluating package (such as GPUdecide in 'SPARSE_LAZY' mode) would
+///                  otherwise construct its decision diagrams whenever the first query needs them,
+///                  i.e. outside of the code block that measures the construction time. Benchmarks
+///                  therefore call `sync()` at the end of each timed phase, just before the time is
+///                  taken.
 ////////////////////////////////////////////////////////////////////////////////
 template <typename Adapter, typename F>
 int
@@ -153,6 +165,10 @@ run(const std::string& benchmark_name, const int varcount, const F& f)
   time_point start = now();
 
   const int exit_code = adapter.run([&]() { return f(adapter); });
+
+  // Anything that is still to be evaluated belongs to the benchmark as a whole; without this a
+  // lazily evaluating package would construct it while the program shuts down (see 'sync()' above).
+  adapter.sync();
 
   rusage rusage_after;
   getrusage(RUSAGE_SELF, &rusage_after);

@@ -271,6 +271,7 @@ run_queens(int argc, char** argv)
 
     const time_point t1        = now();
     typename Adapter::dd_t res = queens_B(adapter);
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t2        = now();
 
     const time_duration construction_time = duration_ms(t1, t2);

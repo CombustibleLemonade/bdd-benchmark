@@ -141,6 +141,7 @@ run_apply(int argc, char** argv)
 
       const time_point t_rebuild_before = now();
       inputs_dd.push_back(lib_bdd::reconstruct(adapter, std::move(inputs_binary.at(i)), vm));
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t_rebuild_after = now();
 
       const size_t load_time = duration_ms(t_rebuild_before, t_rebuild_after);
@@ -184,6 +185,7 @@ run_apply(int argc, char** argv)
       case operand::OR: result |= inputs_dd.at(i); break;
       }
     }
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t_apply_after = now();
 
     const size_t apply_time = duration_ms(t_apply_before, t_apply_after);

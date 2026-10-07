@@ -2876,6 +2876,7 @@ run_mcnet(int argc, char** argv)
 
     const time_point sts_before = now();
     const symbolic_transition_system sts(adapter, std::move(ts), std::move(vp));
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point sts_after = now();
 
     std::cout << json::field("symbolic size (nodes)") << json::value(sts.nodecount()) << json::comma
@@ -2944,6 +2945,7 @@ run_mcnet(int argc, char** argv)
 
       const time_point t1 = now();
       reachable_states    = forwards(adapter, sts);
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t2 = now();
 
       const time_duration time = duration_ms(t1, t2);
@@ -2975,6 +2977,7 @@ run_mcnet(int argc, char** argv)
 
       const time_point t1 = now();
       deadlock_states     = deadlock(adapter, sts, reachable_states);
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t2 = now();
 
       const time_duration time = duration_ms(t1, t2);
@@ -3004,6 +3007,7 @@ run_mcnet(int argc, char** argv)
 
       const time_point t1           = now();
       const scc_summary scc_summary = scc(adapter, sts, reachable_states & ~deadlock_states);
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t2           = now();
 
       const time_duration time = duration_ms(t1, t2);

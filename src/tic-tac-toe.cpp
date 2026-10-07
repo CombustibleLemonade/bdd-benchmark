@@ -304,6 +304,7 @@ run_tictactoe(int argc, char** argv)
 
     time_point t1              = now();
     typename Adapter::dd_t res = construct_init(adapter);
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     time_point t2              = now();
 
     const size_t initial_bdd         = adapter.nodecount(res);
@@ -344,6 +345,7 @@ run_tictactoe(int argc, char** argv)
 #endif // BDD_BENCHMARK_STATS
     }
 
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     time_point t4 = now();
 
 #ifdef BDD_BENCHMARK_STATS

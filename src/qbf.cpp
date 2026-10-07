@@ -1897,6 +1897,7 @@ solve(Adapter& adapter, qcir& q, const variable_order vo = variable_order::INPUT
 #endif // BDD_BENCHMARK_STATS
 
   const auto res                 = cache_get(max_q_idx);
+  adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
   const time_point t_solve_after = now();
 
   const qcir::quant_gate::type_t root_quant = q.root_idx() <= max_q_idx

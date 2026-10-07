@@ -1032,6 +1032,7 @@ construct_net_bdd(const std::string& filename,
   for (const node_id_t output : net.outputs_in_order) {
     construct_node_bdd(net, output, cache, adapter, stats);
   }
+  adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
   const time_point t_construct_after = now();
 
   size_t sum_final_sizes = 0;

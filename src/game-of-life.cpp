@@ -1106,6 +1106,7 @@ acc_rel(Adapter& adapter, const var_map& vm, const int row)
 #endif // BDD_BENCHMARK_STATS
   }
 
+  adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
   const time_point t_apply__after = now();
   goe__apply_time += duration_ms(t_apply__before, t_apply__after);
 
@@ -1138,6 +1139,7 @@ acc_rel(Adapter& adapter, const var_map& vm, const bool bottom)
 
     const time_point t_apply__before = now();
     res &= std::move(row_rel);
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t_apply__after = now();
     goe__apply_time += duration_ms(t_apply__before, t_apply__after);
 
@@ -1169,6 +1171,7 @@ acc_rel(Adapter& adapter, const var_map& vm, const bool bottom)
       res                               = adapter.exists(res, [&quant_row, &vm](int x) -> bool {
         return vm[x].prime() == prime::pre && vm[x].row() == quant_row;
       });
+      adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
       const time_point t_exists__after  = now();
 
       goe__exists_time += duration_ms(t_exists__before, t_exists__after);
@@ -1243,6 +1246,7 @@ garden_of_eden(Adapter& adapter, const var_map& vm)
             || vm.row_symmetric(vm[x], MAX_ROW(prime::post))
             || vm.row_symmetric(vm[x], MAX_ROW(prime::pre)));
     });
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t_exists__after  = now();
 
     goe__exists_time += duration_ms(t_exists__before, t_exists__after);
@@ -1258,6 +1262,7 @@ garden_of_eden(Adapter& adapter, const var_map& vm)
   {
     const time_point t_exists__before = now();
     res = adapter.exists(res, [&vm](int x) -> bool { return vm[x].prime() == prime::pre; });
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t_exists__after = now();
 
     goe__exists_time += duration_ms(t_exists__before, t_exists__after);
@@ -1360,6 +1365,7 @@ run_gameoflife(int argc, char** argv)
     std::cout << json::field("flipped (nodes)") << json::value(adapter.nodecount(res))
               << json::comma << json::endl;
 #endif // BDD_BENCHMARK_STATS
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t4 = now();
 
     const time_duration flip_time = duration_ms(t3, t4);

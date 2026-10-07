@@ -2568,6 +2568,7 @@ run_hamiltonian(int argc, char** argv)
       break;
     }
     }
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point after_paths   = now();
     const time_duration paths_time = duration_ms(before_paths, after_paths);
 

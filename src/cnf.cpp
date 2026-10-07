@@ -462,6 +462,7 @@ run_cnf(int argc, char** argv)
 
     const time_point t1                         = now();
     std::vector<typename Adapter::dd_t> clauses = construct_clauses(adapter, *cnf);
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t2                         = now();
 
     const time_duration clause_cons_time = duration_ms(t1, t2);
@@ -480,6 +481,7 @@ run_cnf(int argc, char** argv)
 
     const time_point t3        = now();
     typename Adapter::dd_t res = conjoin(adapter, clauses.cbegin(), clauses.cend());
+    adapter.sync(); // evaluate lazily recorded operations (no-op for eager packages)
     const time_point t4        = now();
 
     const time_duration apply_time = duration_ms(t3, t4);

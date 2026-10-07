@@ -9,7 +9,7 @@
 
 #include "../common/adapter.h"
 
-#include "SROBDD/bindings/ranger.h"
+#include "QROBDD/bindings/ranger.h"
 
 
 
@@ -34,13 +34,33 @@ class gpudecide_bdd_adapter
 
 	// Init and Deinit
 	public:
-	gpudecide_bdd_adapter(uint32_t varcount) : _bdd(static_cast<uint16_t>(varcount), ranger::SPARSE)
+	// 'SPARSE_LAZY' records operations in a hash-consed operation DAG instead of evaluating each
+	// of them immediately. Everything that has not been evaluated yet is evaluated by 'sync()'
+	// below; benchmarks call it at the end of every timed phase, such that the construction of the
+	// decision diagrams still happens within the measured part of the benchmark.
+	gpudecide_bdd_adapter(uint32_t varcount)
+		: _bdd(static_cast<uint16_t>(varcount), ranger::SPARSE_LAZY)
 	{}
 
 	int
 	run(std::function<int()> f)
 	{
 		return f();
+	}
+
+	// Synchronisation
+	public:
+	////////////////////////////////////////////////////////////////////////////////
+	/// \brief Evaluates all expressions recorded so far.
+	///
+	/// GPUdecide runs in 'SPARSE_LAZY' mode; without this call the construction of the
+	/// decision diagrams would happen whenever a query (such as 'nodecount') first needs it,
+	/// i.e. outside of the code block that measures the construction time.
+	////////////////////////////////////////////////////////////////////////////////
+	inline void
+	sync()
+	{
+		_bdd.synchronize();
 	}
 
 	// BDD Operations

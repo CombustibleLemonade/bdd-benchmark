@@ -480,6 +480,13 @@ public:
     return f();
   }
 
+  // Synchronization
+  /// No-op; LibBDD evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
   inline lib_bdd::bdd_function
   top()

@@ -77,6 +77,14 @@ public:
     return res;
   }
 
+  // Synchronization
+public:
+  /// No-op; OxiDD evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
 public:
   inline oxidd::bdd_function
@@ -396,6 +404,14 @@ public:
     return _manager.run_in_worker_pool(std::move(f));
   }
 
+  // Synchronization
+public:
+  /// No-op; OxiDD evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
 public:
   inline oxidd::bcdd_function
@@ -707,6 +723,14 @@ public:
   run(std::function<int()> f)
   {
     return _manager.run_in_worker_pool(std::move(f));
+  }
+
+  // Synchronization
+public:
+  /// No-op; OxiDD evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
   }
 
   // ZDD Operations

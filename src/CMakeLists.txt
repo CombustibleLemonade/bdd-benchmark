@@ -49,6 +49,14 @@ macro(add_bdd_benchmark NAME)
     __add_benchmark(oxidd  oxidd   ${NAME} bdd)
     set_target_properties(oxidd_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
   endif (OXIDD)
+  if (GPU_DECIDE)
+    # GPUdecide implements only a subset of the BDD benchmarks, so add the
+    # target only if the corresponding source file exists.
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/gpudecide/${NAME}_bdd.cpp)
+      __add_benchmark(gpudecide gpudecide ${NAME} bdd)
+      set_target_properties(gpudecide_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
+    endif ()
+  endif (GPU_DECIDE)
 endmacro(add_bdd_benchmark)
 
 macro(add_bcdd_benchmark NAME)
@@ -173,21 +181,3 @@ add_bdd_benchmark(relprod)
 add_bcdd_benchmark(relprod)
 
 add_benchmark(cnf)
-
-__add_benchmark(gpudecide gpudecide apply bdd)
-set_target_properties(gpudecide_apply_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
-
-__add_benchmark(gpudecide gpudecide cnf bdd)
-set_target_properties(gpudecide_cnf_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
-
-__add_benchmark(gpudecide gpudecide game-of-life bdd)
-set_target_properties(gpudecide_game-of-life_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
-
-__add_benchmark(gpudecide gpudecide hamiltonian bdd)
-set_target_properties(gpudecide_hamiltonian_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
-
-__add_benchmark(gpudecide gpudecide queens bdd)
-set_target_properties(gpudecide_queens_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
-
-__add_benchmark(gpudecide gpudecide tic-tac-toe bdd)
-set_target_properties(gpudecide_tic-tac-toe_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)

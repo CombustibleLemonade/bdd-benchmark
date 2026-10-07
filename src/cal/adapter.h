@@ -65,6 +65,14 @@ public:
     return f();
   }
 
+  // Synchronization
+public:
+  /// No-op; CAL evaluates each operation immediately (see 'common/adapter.h').
+  inline void
+  sync()
+  {
+  }
+
   // BDD Operations
 public:
   inline BDD

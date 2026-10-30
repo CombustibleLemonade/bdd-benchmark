@@ -56,9 +56,10 @@ macro(add_bdd_benchmark NAME)
       __add_benchmark(gpudecide gpudecide ${NAME} bdd)
       set_target_properties(gpudecide_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
     endif ()
-    # Same for CPUdecide
+    # Same for CPUdecide: the executables are built from the cpudecide sources, but they link
+    # against the same gpudecide library as GPUdecide (CPUdecide is the host administrator of it).
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cpudecide/${NAME}_bdd.cpp)
-      __add_benchmark(cpudecide cpudecide ${NAME} bdd)
+      __add_benchmark(cpudecide gpudecide ${NAME} bdd)
       set_target_properties(cpudecide_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
     endif ()
   endif (GPU_DECIDE)

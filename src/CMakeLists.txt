@@ -56,6 +56,11 @@ macro(add_bdd_benchmark NAME)
       __add_benchmark(gpudecide gpudecide ${NAME} bdd)
       set_target_properties(gpudecide_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
     endif ()
+    # Same for CPUdecide
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cpudecide/${NAME}_bdd.cpp)
+      __add_benchmark(cpudecide cpudecide ${NAME} bdd)
+      set_target_properties(cpudecide_${NAME}_bdd PROPERTIES C_STANDARD 20 CXX_STANDARD 20)
+    endif ()
   endif (GPU_DECIDE)
 endmacro(add_bdd_benchmark)
 
